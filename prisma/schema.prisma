@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ScanStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum ReportFormat {
+  PDF
+  JSON
+  HTML
+}
+
+enum ScanIntensity {
+  LIGHT
+  MEDIUM
+  AGGRESSIVE
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum TeamRole {
+  LEADER
+  MEMBER
+  VIEWER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum InviteType {
+  PROJECT
+  TEAM
+}
+
+model User {
+  id                  String          @id @default(cuid())
+  email               String          @unique
+  password            String
+  name                String
+  avatar              String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  scans               Scan[]
+  projectMembers      ProjectMember[]
+  teamMembers         TeamMember[]
+  ownedProjects       Project[]       @relation("ProjectOwner")
+  ownedTeams          Team[]          @relation("TeamOwner")
+  sentInvitations     Invitation[]    @relation("InviteSender")
+  receivedInvitations Invitation[]    @relation("InviteReceiver")
+
+  @@map("users")
+}
+
+model Project {
+  id          String            @id @default(cuid())
+  name        String
+  description String?           @db.Text
+  slug        String            @unique
+  color       String            @default("#6366f1")
+  ownerId     String
+  owner       User              @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     ProjectMember[]
+  scans       Scan[]
+  teams       TeamsOnProjects[]
+  invitations Invitation[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+model Team {
+  id          String            @id @default(cuid())
+  name        String
+  description String?           @db.Text
+  slug        String            @unique
+  color       String            @default("#8b5cf6")
+  ownerId     String
+  owner       User              @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  projects    TeamsOnProjects[]
+  invitations Invitation[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     TeamRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+model TeamsOnProjects {
+  id         String   @id @default(cuid())
+  teamId     String
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+
+  @@unique([teamId, projectId])
+  @@map("teams_on_projects")
+}
+
+model Invitation {
+  id         String       @id @default(cuid())
+  type       InviteType
+  status     InviteStatus @default(PENDING)
+  role       String       @default("MEMBER")
+  senderId   String
+  sender     User         @relation("InviteSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User         @relation("InviteReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  projectId  String?
+  project    Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  teamId     String?
+  team       Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  message    String?      @db.Text
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@map("invitations")
+}
+
+model Scan {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  targetUrl   String
+  status      ScanStatus    @default(PENDING)
+  intensity   ScanIntensity @default(MEDIUM)
+  openApiSpec Json?
+  authConfig  Json?
+  progress    Int           @default(0)
+  totalChecks Int           @default(0)
+  findings    Finding[]
+  reports     Report[]
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("scans")
+}
+
+model Finding {
+  id           String   @id @default(cuid())
+  scanId       String
+  scan         Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  checkType    String
+  severity     Severity
+  title        String
+  description  String   @db.Text
+  evidence     Json
+  owaspMapping String
+  owaspId      String
+  remediation  String   @db.Text
+  endpoint     String?
+  method       String?
+  createdAt    DateTime @default(now())
+
+  @@map("findings")
+}
+
+model Report {
+  id        String       @id @default(cuid())
+  scanId    String
+  scan      Scan         @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  format    ReportFormat
+  filePath  String?
+  data      Json?
+  createdAt DateTime     @default(now())
+
+  @@map("reports")
+}
