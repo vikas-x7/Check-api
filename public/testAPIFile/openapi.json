@@ -1,0 +1,215 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Vulnerable Bookstore API",
+    "version": "1.0.0",
+    "description": "Deliberately insecure API for training and scanner testing."
+  },
+  "servers": [
+    { "url": "http://localhost:4000" }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "API status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books": {
+      "get": {
+        "summary": "List books",
+        "responses": {
+          "200": {
+            "description": "Array of books",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Book" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create book",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BookInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created book",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Book" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books/{id}": {
+      "get": {
+        "summary": "Get book by id",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Book", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Book" } } } },
+          "404": { "description": "Not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete book",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Deleted" },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "List users",
+        "responses": {
+          "200": { "description": "Array of users", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/User" } } } } }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Get user by id",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "User", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "404": { "description": "Not found" }
+        }
+      },
+      "put": {
+        "summary": "Update user",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserInput" } } }
+        },
+        "responses": {
+          "200": { "description": "Updated user", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "summary": "List orders",
+        "responses": {
+          "200": { "description": "Array of orders", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Order" } } } } }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "summary": "Get order by id",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Order", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Order" } } } },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/api/debug": {
+      "get": {
+        "summary": "Debug data (unsafe)",
+        "responses": {
+          "200": { "description": "Environment and process data", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string" },
+          "version": { "type": "string" },
+          "uptime": { "type": "number" }
+        }
+      },
+      "Book": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "price": { "type": "number" },
+          "isbn": { "type": "string" },
+          "stock": { "type": "integer" }
+        }
+      },
+      "BookInput": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "price": { "type": "number" },
+          "isbn": { "type": "string" },
+          "stock": { "type": "integer" }
+        },
+        "required": ["title", "author", "price", "isbn", "stock"]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "password": { "type": "string" },
+          "role": { "type": "string" },
+          "ssn": { "type": "string" },
+          "creditCard": { "type": "string" },
+          "internalId": { "type": "string" },
+          "apiKey": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "UserInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "password": { "type": "string" },
+          "role": { "type": "string" },
+          "ssn": { "type": "string" },
+          "creditCard": { "type": "string" },
+          "internalId": { "type": "string" },
+          "apiKey": { "type": "string" }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "userId": { "type": "integer" },
+          "bookId": { "type": "integer" },
+          "quantity": { "type": "integer" },
+          "total": { "type": "number" },
+          "status": { "type": "string" },
+          "secretNote": { "type": "string" }
+        }
+      }
+    }
+  }
+}

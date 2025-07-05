@@ -1,0 +1,11 @@
+GET /api/health
+GET /api/books
+POST /api/books
+GET /api/books/:id
+DELETE /api/books/:id
+GET /api/users
+GET /api/users/:id
+PUT /api/users/:id
+GET /api/orders
+GET /api/orders/:id
+GET /api/debug

@@ -1,0 +1,30 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Vulnerable Bookstore API",
+    "version": "1.0.0",
+    "description": "Deliberately insecure API for testing"
+  },
+  "host": "localhost:4000",
+  "schemes": ["http"],
+  "paths": {
+    "/api/health": {"get": {"responses": {"200": {"description": "OK"}}}},
+    "/api/books": {
+      "get": {"responses": {"200": {"description": "OK"}}},
+      "post": {"parameters": [{"name":"body","in":"body","required":true,"schema":{"$ref":"#/definitions/Book"}}],"responses":{"201":{"description":"Created"}}}
+    },
+    "/api/books/{id}": {
+      "get": {"parameters": [{"name":"id","in":"path","required":true,"type":"integer"}],"responses":{"200":{"description":"OK"},"404":{"description":"Not found"}}},
+      "delete": {"parameters": [{"name":"id","in":"path","required":true,"type":"integer"}],"responses":{"200":{"description":"Deleted"},"404":{"description":"Not found"}}}
+    },
+    "/api/users": {"get": {"responses": {"200": {"description": "OK"}}}},
+    "/api/users/{id}": {"get": {"parameters":[{"name":"id","in":"path","required":true,"type":"integer"}],"responses":{"200":{"description":"OK"},"404":{"description":"Not found"}}},"put":{"parameters":[{"name":"id","in":"path","required":true,"type":"integer"},{"name":"body","in":"body","required":true,"schema":{"$ref":"#/definitions/User"}}],"responses":{"200":{"description":"OK"},"404":{"description":"Not found"}}}},
+    "/api/orders": {"get": {"responses": {"200": {"description": "OK"}}}},
+    "/api/orders/{id}": {"get": {"parameters":[{"name":"id","in":"path","required":true,"type":"integer"}],"responses":{"200":{"description":"OK"},"404":{"description":"Not found"}}}},
+    "/api/debug": {"get": {"responses": {"200": {"description": "OK"}}}}
+  },
+  "definitions": {
+    "Book": {"type":"object","properties":{"id":{"type":"integer"},"title":{"type":"string"},"author":{"type":"string"},"price":{"type":"number"},"isbn":{"type":"string"},"stock":{"type":"integer"}}},
+    "User": {"type":"object","properties":{"id":{"type":"integer"},"name":{"type":"string"},"email":{"type":"string"},"password":{"type":"string"},"role":{"type":"string"},"ssn":{"type":"string"},"creditCard":{"type":"string"},"internalId":{"type":"string"},"apiKey":{"type":"string"},"createdAt":{"type":"string","format":"date-time"}}}
+  }
+}

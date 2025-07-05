@@ -1,0 +1,20 @@
+{
+  "info": {
+    "name": "Vulnerable Bookstore API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    { "name": "Health", "request": { "method": "GET", "url": "http://localhost:4000/api/health" } },
+    { "name": "List Books", "request": { "method": "GET", "url": "http://localhost:4000/api/books" } },
+    { "name": "Get Book", "request": { "method": "GET", "url": "http://localhost:4000/api/books/:id" } },
+    { "name": "Create Book", "request": { "method": "POST", "url": "http://localhost:4000/api/books", "body": { "mode": "raw", "raw": "{\"title\":\"New Book\",\"author\":\"Author\",\"price\":19.99,\"isbn\":\"1234567890\",\"stock\":100}" } } },
+    { "name": "Delete Book", "request": { "method": "DELETE", "url": "http://localhost:4000/api/books/:id" } },
+    { "name": "List Users", "request": { "method": "GET", "url": "http://localhost:4000/api/users" } },
+    { "name": "Get User", "request": { "method": "GET", "url": "http://localhost:4000/api/users/:id" } },
+    { "name": "Update User", "request": { "method": "PUT", "url": "http://localhost:4000/api/users/:id", "body": { "mode": "raw", "raw": "{\"name\":\"Bob\"}" } } },
+    { "name": "List Orders", "request": { "method": "GET", "url": "http://localhost:4000/api/orders" } },
+    { "name": "Get Order", "request": { "method": "GET", "url": "http://localhost:4000/api/orders/:id" } },
+    { "name": "Debug", "request": { "method": "GET", "url": "http://localhost:4000/api/debug" } }
+  ]
+}
